@@ -95,14 +95,10 @@ int execute_command(t_gen *micro, char **args, int len)
 
 int execute_command_pipe(t_gen *micro, char **args, int len)
 {
-    (void)micro;
-    (void)len;
-    /*int pid
+    pid_t pid;
+    int exit_stat;
 
-    if (fds[ENTRY] != -1)
-        close(fds[WRITE]);
-    if (fds[READ] != -1)
-        close(fds[READ]);
+    
     if (pipe(fds) == -1)
         error();
     pid = fork();
@@ -113,19 +109,19 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
         close(fds[READ]);
         dup2(fds[WRITE], FD_OUT);
         close(fds[WRITE]);
-        execve();
-        error();
-        free();
+        cmd = create_cmd(args, len);
+        execve(cmd[0], cmd, micro->env);
+        ft_putstr_fd("error: cannot execute ", 2);
+        ft_putstr_fd(cmd[0], 2);
+        ft_putstr_fd("\n", 2);
+        //free();
     }
     else
-    {
         micro->pid++;
         close(fd[WRITE]);
         dup2(fds[READ], STD_IN);
         close(fds[READ]);
-    }*/
-    ft_putstr_fd(args[0], 1);
-    ft_putstr_fd(" with pipe \n", 1);
+    }
     return (1);
 
 }
