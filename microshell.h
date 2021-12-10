@@ -14,6 +14,7 @@ typedef struct s_gen
     int len;
     int pids;
     int fds;
+    char **env;
 } t_gen;
 
 #endif

@@ -40,18 +40,22 @@ int ft_strncmp(char *s1, char *s2, int len)
     return (1);
 }
 
+char **create_cmd(char **ptr_cmd, int len)
+{
+    int i;
+
+
+}
+
 int execute_command(t_gen *micro, char **args, int len)
 {
-    (void)micro;
-    (void)len;
-    /*int pid;
+    int pid;
 
     pid = fork();
     if (pid < 0)
         return (0);
     else if (pid == 0)
     {
-        dup2(micro->fd_in, STD_IN);
         create_cmds();
         execve()
         error()
@@ -62,9 +66,7 @@ int execute_command(t_gen *micro, char **args, int len)
         waitpid(&pid, &status, NULL);
         if (micro->fd_in >= 0)
             close(micro->fd_in);
-    }*/
-    ft_putstr_fd(args[0], 1);
-    ft_putstr_fd("\n", 1);
+    }
     return (1);
 }
 
@@ -134,13 +136,14 @@ int execution(t_gen *micro)
 }
 
 
-int main (int ac, char **av)
+int main (int ac, char **av, char **env)
 {
     (void)ac;
     t_gen micro;
 
     micro.args = &av[1];
     micro.len = ac - 1;
+    micro.env = env;
     if (!execution(&micro))
         error(&micro, 1);
     return (1);
