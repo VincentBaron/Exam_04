@@ -43,30 +43,53 @@ int ft_strncmp(char *s1, char *s2, int len)
 char **create_cmd(char **ptr_cmd, int len)
 {
     int i;
+    char **cmd;
 
+    if (!(cmd = (char**)malloc(sizeof(char) * (len + 1))))
+        return (NULL);
+    i = 0;
+    while (i < len)
+    {
+        cmd[i] = ptr_cmd[i];
+        i++;
+    }
+    cmd[i] = NULL;
+    return (cmd);
+}
 
+void print_tab(char **s)
+{
+    int i;
+
+    i = 0;
+    while (s[i])
+    {
+        printf("tab[%i]: %s\n", i, s[i]);
+        i++;
+    }
 }
 
 int execute_command(t_gen *micro, char **args, int len)
 {
-    int pid;
+    pid_t pid;
+    int exit_stat;
+    char **cmd;
 
+   cmd = NULL;
     pid = fork();
     if (pid < 0)
         return (0);
     else if (pid == 0)
     {
-        create_cmds();
-        execve()
-        error()
-        free();
+        cmd = create_cmd(args, len);
+        execve(cmd[0], cmd, micro->env);
+        ft_putstr_fd("error: cannot execute ", 2);
+        ft_putstr_fd(cmd[0], 2);
+        ft_putstr_fd("\n", 2);
+        //free();
     }
     else
-    {
-        waitpid(&pid, &status, NULL);
-        if (micro->fd_in >= 0)
-            close(micro->fd_in);
-    }
+        waitpid(pid, &exit_stat, 0);
     return (1);
 }
 
@@ -118,20 +141,20 @@ int execution(t_gen *micro)
     {
         if (ft_strncmp(head[i], ";", 1))
         {
-            execute_command(micro, head, i - 1);
+            execute_command(micro, head, i);
             head = &head[i + 1];
             i = 0;
         }
         else if (ft_strncmp(head[i], "|", 1))
         {
-            execute_command_pipe(micro, head, i - 1);
+            execute_command_pipe(micro, head, i);
             head = &head[i + 1];
             i = 0;
         }
         else
             i++;
     }
-    execute_command(micro, head, i - 1);
+    execute_command(micro, head, i);
     return(1);
 }
 
