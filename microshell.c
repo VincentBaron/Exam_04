@@ -136,6 +136,25 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
     return (1);
 }
 
+int execute_cd(t_gen *micro, char **head, int len)
+{
+    (void)micro;
+
+    if (len > 2)
+    {
+        ft_putstr_fd("error: cd: bad arguments\n", 2);
+        return (0);
+    }
+    if ((chdir(head[1])) == -1)
+    {
+        ft_putstr_fd("error: cd: cannot change directory to: ", 2);
+        ft_putstr_fd(head[1], 2);
+        ft_putstr_fd("\n", 2);
+        return (0);
+    }
+    return (1);
+}
+
 int execution(t_gen *micro)
 {
     int i;
@@ -147,7 +166,10 @@ int execution(t_gen *micro)
     {
         if (ft_strncmp(head[i], ";", 1))
         {
-            execute_command(micro, head, i);
+            if (ft_strncmp(head[0], "cd", 2))
+                execute_cd(micro, head, i);
+            else
+                execute_command(micro, head, i);
             head = &head[i + 1];
             i = 0;
         }
@@ -160,7 +182,10 @@ int execution(t_gen *micro)
         else
             i++;
     }
-    execute_command(micro, head, i);
+     if (ft_strncmp(head[0], "cd", 2))
+        execute_cd(micro, head, i);
+     else
+        execute_command(micro, head, i);
     return(1);
 }
 
