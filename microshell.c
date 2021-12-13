@@ -195,6 +195,8 @@ int main (int ac, char **av, char **env)
     (void)ac;
     t_gen micro;
 
+    if (ac < 2)
+        return (0);
     micro.args = &av[1];
     micro.len = ac - 1;
     micro.env = env;
