@@ -74,7 +74,6 @@ int execute_command(t_gen *micro, char **args, int len)
     pid_t pid;
     int exit_stat;
     char **cmd;
-    int i;
 
    cmd = NULL;
     pid = fork();
@@ -87,20 +86,11 @@ int execute_command(t_gen *micro, char **args, int len)
         ft_putstr_fd("error: cannot execute ", 2);
         ft_putstr_fd(cmd[0], 2);
         ft_putstr_fd("\n", 2);
+        exit (1);
         //free();
     }
     else
-    {
-        i = 0;
-        while (i < micro->pids)
-        {
-            waitpid(0, &exit_stat, 0);
-            i++;
-        }
         waitpid(pid, &exit_stat, 0);
-
-    }
-
     return (1);
 }
 
@@ -108,6 +98,7 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
 {
     pid_t pid;
     int fds[2];
+    int exit_stat;
     char **cmd;
 
     
@@ -132,17 +123,17 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
         ft_putstr_fd("error: cannot execute ", 2);
         ft_putstr_fd(cmd[0], 2);
         ft_putstr_fd("\n", 2);
+        exit (1);
         //free();
     }
     else
     {
-        micro->pids++;
+        waitpid(pid, &exit_stat, 0);
         close(fds[WRITE]);
         dup2(fds[READ], 0);
         close(fds[READ]);
     }
     return (1);
-
 }
 
 int execution(t_gen *micro)
