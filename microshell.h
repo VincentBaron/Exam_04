@@ -1,6 +1,7 @@
 # ifndef MICRO_SHELL_H
 # define MICRO_SHELL_H 
 # include <unistd.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -18,6 +19,8 @@ typedef struct s_gen
     int pids;
     char **env;
 } t_gen;
+
+void print_tab(char **s);
 
 #endif
 

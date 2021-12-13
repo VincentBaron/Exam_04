@@ -45,7 +45,7 @@ char **create_cmd(char **ptr_cmd, int len)
     int i;
     char **cmd;
 
-    if (!(cmd = (char**)malloc(sizeof(char) * (len + 1))))
+    if (!(cmd = (char**)malloc(sizeof(char *) * (len + 1))))
         return (NULL);
     i = 0;
     while (i < len)
@@ -69,6 +69,12 @@ void print_tab(char **s)
     }
 }
 
+void free_cmd(char **cmd)
+{
+    (void)cmd;
+    free(cmd);
+}
+
 int execute_command(t_gen *micro, char **args, int len)
 {
     pid_t pid;
@@ -87,7 +93,7 @@ int execute_command(t_gen *micro, char **args, int len)
         ft_putstr_fd(cmd[0], 2);
         ft_putstr_fd("\n", 2);
         exit (1);
-        //free();
+        free_cmd(cmd);
     }
     else
         waitpid(pid, &exit_stat, 0);
@@ -102,6 +108,7 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
     char **cmd;
 
     
+    cmd = NULL;
     if (pipe(fds) == -1)
     {
         error(micro, 2);
@@ -124,7 +131,7 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
         ft_putstr_fd(cmd[0], 2);
         ft_putstr_fd("\n", 2);
         exit (1);
-        //free();
+        free_cmd(cmd);
     }
     else
     {
