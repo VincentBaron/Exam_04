@@ -92,8 +92,8 @@ int execute_command(t_gen *micro, char **args, int len)
         ft_putstr_fd("error: cannot execute ", 2);
         ft_putstr_fd(cmd[0], 2);
         ft_putstr_fd("\n", 2);
-        exit (1);
         free_cmd(cmd);
+        exit (1);
     }
     else
         waitpid(pid, &exit_stat, 0);
@@ -130,8 +130,8 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
         ft_putstr_fd("error: cannot execute ", 2);
         ft_putstr_fd(cmd[0], 2);
         ft_putstr_fd("\n", 2);
-        exit (1);
         free_cmd(cmd);
+        exit (1);
     }
     else
     {
