@@ -29,15 +29,12 @@ int error(t_gen *mother, int type)
 int ft_strncmp(char *s1, char *s2, int len)
 {
     int i;
+    (void)len;
 
     i = 0;
-    while (i < len && s2[i])
-    {
-        if (s1[i] != s2[i])
-            return (0);
+    while (s1[i] && s2[i] && s1[i] == s2[i])
         i++;
-    }
-    return (1);
+    return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
 char **create_cmd(char **ptr_cmd, int len)
@@ -96,8 +93,11 @@ int execute_command(t_gen *micro, char **args, int len)
         exit (1);
     }
     else
-        waitpid(pid, &exit_stat, 0);
-    return (1);
+    {
+         waitpid(pid, &exit_stat, 0);
+         return (exit_stat);
+    }
+    return (0);
 }
 
 int execute_command_pipe(t_gen *micro, char **args, int len)
@@ -139,6 +139,8 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
         close(fds[WRITE]);
         dup2(fds[READ], 0);
         close(fds[READ]);
+        if (exit_stat == 1)
+            exit (1);
     }
     return (1);
 }
@@ -166,34 +168,35 @@ int execution(t_gen *micro)
 {
     int i;
     char **head;
+    int ret;
 
     head = micro->args;
     i = 0;
     while (head[i])
     {
-        if (ft_strncmp(head[i], ";", 1))
+        if (!ft_strncmp(head[i], ";", ft_strlen(head[i])))
         {
-            if (ft_strncmp(head[0], "cd", 2))
+            if (!ft_strncmp(head[0], "cd", ft_strlen(head[0])))
                 execute_cd(micro, head, i);
             else
-                execute_command(micro, head, i);
+                ret = execute_command(micro, head, i);
             head = &head[i + 1];
             i = 0;
         }
-        else if (ft_strncmp(head[i], "|", 1))
+        else if (!ft_strncmp(head[i], "|", 1))
         {
-            execute_command_pipe(micro, head, i);
+            ret = execute_command_pipe(micro, head, i);
             head = &head[i + 1];
             i = 0;
         }
         else
             i++;
     }
-     if (ft_strncmp(head[0], "cd", 2))
+     if (!ft_strncmp(head[0], "cd", 2))
         execute_cd(micro, head, i);
      else
-        execute_command(micro, head, i);
-    return(1);
+        ret = execute_command(micro, head, i);
+    return(ret);
 }
 
 
@@ -201,14 +204,15 @@ int main (int ac, char **av, char **env)
 {
     (void)ac;
     t_gen micro;
+    int ret;
 
+    ret = 0;
     if (ac < 2)
         return (0);
     micro.args = &av[1];
     micro.len = ac - 1;
     micro.env = env;
     micro.pids = 0;
-    if (!execution(&micro))
-        error(&micro, 1);
-    return (1);
+    ret = execution(&micro);
+    return (WEXITSTATUS(ret));
 }
