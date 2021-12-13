@@ -31,13 +31,13 @@ int ft_strncmp(char *s1, char *s2, int len)
     int i;
 
     i = 0;
-    while (i < len && s2[i] && s1[i])
+    while (i < len && s2[i])
     {
         if (s1[i] != s2[i])
             return (0);
         i++;
     }
-    return (s1[i] - s2[i]);
+    return (1);
 }
 
 char **create_cmd(char **ptr_cmd, int len)
@@ -108,8 +108,6 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
     char **cmd;
 
     
-    if (len == 0)
-        return (0);
     cmd = NULL;
     if (pipe(fds) == -1)
     {
@@ -168,11 +166,9 @@ int execution(t_gen *micro)
 {
     int i;
     char **head;
-    int z;
 
     head = micro->args;
     i = 0;
-    z = 0;
     while (head[i])
     {
         if (ft_strncmp(head[i], ";", 1))
@@ -187,13 +183,11 @@ int execution(t_gen *micro)
         else if (ft_strncmp(head[i], "|", 1))
         {
             execute_command_pipe(micro, head, i);
-            if (z < micro->len)
             head = &head[i + 1];
             i = 0;
         }
         else
             i++;
-        z++;
     }
      if (ft_strncmp(head[0], "cd", 2))
         execute_cd(micro, head, i);
