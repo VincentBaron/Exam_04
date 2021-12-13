@@ -74,6 +74,7 @@ int execute_command(t_gen *micro, char **args, int len)
     pid_t pid;
     int exit_stat;
     char **cmd;
+    int i;
 
    cmd = NULL;
     pid = fork();
@@ -89,25 +90,42 @@ int execute_command(t_gen *micro, char **args, int len)
         //free();
     }
     else
+    {
+        i = 0;
+        while (i < micro->pids)
+        {
+            waitpid(0, &exit_stat, 0);
+            i++;
+        }
         waitpid(pid, &exit_stat, 0);
+
+    }
+
     return (1);
 }
 
 int execute_command_pipe(t_gen *micro, char **args, int len)
 {
     pid_t pid;
-    int exit_stat;
+    int fds[2];
+    char **cmd;
 
     
     if (pipe(fds) == -1)
-        error();
+    {
+        error(micro, 2);
+        return (0);
+    }
     pid = fork();
     if (pid == -1)
-        error();
+    {
+        error(micro, 2);
+        return (0);
+    }
     else if (pid == 0)
     {
         close(fds[READ]);
-        dup2(fds[WRITE], FD_OUT);
+        dup2(fds[WRITE], 1);
         close(fds[WRITE]);
         cmd = create_cmd(args, len);
         execve(cmd[0], cmd, micro->env);
@@ -117,9 +135,10 @@ int execute_command_pipe(t_gen *micro, char **args, int len)
         //free();
     }
     else
-        micro->pid++;
-        close(fd[WRITE]);
-        dup2(fds[READ], STD_IN);
+    {
+        micro->pids++;
+        close(fds[WRITE]);
+        dup2(fds[READ], 0);
         close(fds[READ]);
     }
     return (1);
@@ -163,6 +182,7 @@ int main (int ac, char **av, char **env)
     micro.args = &av[1];
     micro.len = ac - 1;
     micro.env = env;
+    micro.pids = 0;
     if (!execution(&micro))
         error(&micro, 1);
     return (1);
